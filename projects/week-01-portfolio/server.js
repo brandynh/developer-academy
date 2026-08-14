@@ -26,12 +26,32 @@ const server = http.createServer((req, res) => {
 
         let body = "";
 
+
         req.on("data", (chunk) => {
             body += chunk;
         });
 
         req.on("end", () => {
-            console.log(body);
+
+            const params = new URLSearchParams(body);
+            console.log("RAW BODY:", JSON.stringify(body));
+
+            console.log("Name: " + params.get("name"));
+            console.log("Email: " + params.get("email"));
+            console.log("Subject: " + params.get("subject"));
+            console.log("Message: " + params.get("message"));
+
+            const formData = {
+                name: params.get("name"),
+                email: params.get("email"),
+                subject: params.get("subject"),
+                message: params.get("message")
+            };
+
+
+            console.log(formData);
+
+
 
             res.writeHead(200, { "Content-Type": "text/plain" });
             res.end("Form received!");
