@@ -31,6 +31,9 @@ const server = http.createServer((req, res) => {
             body += chunk;
         });
 
+
+
+
         req.on("end", () => {
 
             const params = new URLSearchParams(body);
@@ -41,7 +44,9 @@ const server = http.createServer((req, res) => {
             console.log("Subject: " + params.get("subject"));
             console.log("Message: " + params.get("message"));
 
+
             const formData = {
+
                 name: params.get("name"),
                 email: params.get("email"),
                 subject: params.get("subject"),
@@ -49,14 +54,37 @@ const server = http.createServer((req, res) => {
             };
 
 
+            if (!formData.name) {
+                res.writeHead(400, { "Content-Type": "text/plain" });
+                res.end("Name is required!");
+                return;
+            };
+
+            if (!formData.email.includes("@")) {
+                res.writeHead(400, { "Content-Type": "text/plain" });
+                res.end("Invalid email!");
+                return;
+
+            };
+
+            if (!formData.message) {
+                res.writeHead(400, { "Content-Type": "text/plain" });
+                res.end("Message is required!");
+                return;
+            }
+
             console.log(formData);
 
 
 
             res.writeHead(200, { "Content-Type": "text/plain" });
             res.end("Form received!");
-        });
 
+
+
+
+
+        });
     } else {
         res.writeHead(404, { "Content-Type": "text/plain" });
         res.end("404 Not found!");
