@@ -81,10 +81,35 @@ const server = http.createServer((req, res) => {
             res.end("Form received!");
 
 
+            const jsonData = JSON.stringify(formData);
 
+            fs.writeFile("submissions.json", jsonData, (err) => {
 
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+
+                console.log("Submission Saved!");
+            });
 
         });
+    } else if (req.url === "/submissions" && req.method === "GET") {
+
+        fs.readFile("submissions.json", (err, data) => {
+            if (err) {
+                res.writeHead(400, { "Content-Type": "text/plain" });
+                res.end("Unable to retrieve data.");
+                return;
+            }
+
+            const submissionData = JSON.parse(data);
+            res.writeHead(200, { "Content-Type": "application/json" });
+            res.end(JSON.stringify(submissionData));
+        });
+
+
+
     } else {
         res.writeHead(404, { "Content-Type": "text/plain" });
         res.end("404 Not found!");
