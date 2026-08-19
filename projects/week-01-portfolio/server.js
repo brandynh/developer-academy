@@ -75,23 +75,32 @@ const server = http.createServer((req, res) => {
 
             console.log(formData);
 
-
-
-            res.writeHead(200, { "Content-Type": "text/plain" });
-            res.end("Form received!");
-
-
-            const jsonData = JSON.stringify(formData);
-
-            fs.writeFile("submissions.json", jsonData, (err) => {
-
+            fs.readFile("submissions.json", "utf8", (err, data) => {
                 if (err) {
                     console.error(err);
                     return;
                 }
+                const submissions = JSON.parse(data);
+                submissions.push(formData);
+                const jsonData = JSON.stringify(submissions);
 
-                console.log("Submission Saved!");
+                fs.writeFile("submissions.json", jsonData, (err) => {
+
+                    if (err) {
+                        console.error(err);
+                        return;
+                    }
+
+                    console.log("Submission Saved!");
+
+                    res.writeHead(200, { "Content-Type": "text/plain" });
+                    res.end("Form received!");
+                });
+
+
             });
+
+
 
         });
     } else if (req.url === "/submissions" && req.method === "GET") {
@@ -103,9 +112,9 @@ const server = http.createServer((req, res) => {
                 return;
             }
 
-            const submissionData = JSON.parse(data);
+            const submissions = JSON.parse(data);
             res.writeHead(200, { "Content-Type": "application/json" });
-            res.end(JSON.stringify(submissionData));
+            res.end(JSON.stringify(submissions));
         });
 
 
