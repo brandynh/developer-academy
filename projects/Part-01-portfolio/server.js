@@ -1,9 +1,19 @@
 const http = require("http");
 const fs = require("fs");
 
+function sendJSON(res, statusCode, data) {
+
+    res.writeHead(statusCode, {
+        "Content-Type": "application/json"
+    });
+    res.end(JSON.stringify(data));
+
+};
+
 const server = http.createServer((req, res) => {
 
     const parts = req.url.split("/");
+
     console.log(req.method, req.url);
 
     if (req.url === "/" && req.method === "GET") {
@@ -57,21 +67,27 @@ const server = http.createServer((req, res) => {
 
 
             if (!formData.name) {
-                res.writeHead(400, { "Content-Type": "text/plain" });
-                res.end("Name is required!");
+                const response = {
+                    error: "Name is required"
+                };
+                sendJSON(res, 400, response);
                 return;
             };
 
             if (!formData.email.includes("@")) {
-                res.writeHead(400, { "Content-Type": "text/plain" });
-                res.end("Invalid email!");
+                const response = {
+                    error: "Invalid email"
+                };
+                sendJSON(res, 400, response);
                 return;
 
             };
 
             if (!formData.message) {
-                res.writeHead(400, { "Content-Type": "text/plain" });
-                res.end("Message is required!");
+                const response = {
+                    error: "Message is required"
+                };
+                sendJSON(res, 400, response);
                 return;
             }
 
@@ -97,8 +113,12 @@ const server = http.createServer((req, res) => {
 
                     console.log("Submission Saved!");
 
-                    res.writeHead(200, { "Content-Type": "text/plain" });
-                    res.end("Form received!");
+                    const response = {
+                        message: "Submission created successfully!",
+                        submission: formData
+                    };
+
+                    sendJSON(res, 201, response);
                 });
 
 
@@ -140,16 +160,19 @@ const server = http.createServer((req, res) => {
             const submission = submissions[index];
 
             if (submission === undefined) {
-                res.writeHead(404, { "Content-Type": "text/plain" });
-                res.end("Data not found");
+
+                sendJSON(res, 404, {
+                    error: "Resource not found"
+                });
                 return;
             }
             res.writeHead(200, { "Content-Type": "application/json" });
             res.end(JSON.stringify(submission));
         });
     } else {
-        res.writeHead(404, { "Content-Type": "text/plain" });
-        res.end("404 Not found!");
+        sendJSON(res, 404, {
+            error: "Resource not found"
+        });
     }
 });
 
