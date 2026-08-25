@@ -169,6 +169,49 @@ const server = http.createServer((req, res) => {
             res.writeHead(200, { "Content-Type": "application/json" });
             res.end(JSON.stringify(submission));
         });
+    } else if (
+        req.method === "DELETE" &&
+        parts[1] === "submissions" &&
+        parts[2] !== undefined
+    ) {
+
+        fs.readFile("submissions.json", "utf8", (err, data) => {
+            if (err) {
+                sendJSON(res, 500, {
+                    error: "Unable to retrieve submissions"
+                });
+                return;
+            }
+            const submissions = JSON.parse(data);
+            const index = Number(parts[2]);
+            const submission = submissions[index];
+
+            if (submission === undefined) {
+                sendJSON(res, 404, {
+                    error: "Submission not found"
+                });
+                return;
+            } else {
+
+                submissions.splice(index, 1);
+            }
+
+            const jsonData = JSON.stringify(submissions);
+
+            fs.writeFile("submissions.json", jsonData, (err) => {
+                if (err) {
+                    sendJSON(res, 500, {
+                        error: "Unable to write file"
+                    });
+                    return;
+                }
+            });
+
+            res.writeHead(204);
+            res.end();
+
+        });
+
     } else {
         sendJSON(res, 404, {
             error: "Resource not found"
