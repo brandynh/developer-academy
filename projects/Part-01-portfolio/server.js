@@ -1,5 +1,6 @@
 const http = require("http");
 const fs = require("fs");
+const { error } = require("console");
 
 function sendJSON(res, statusCode, data) {
 
@@ -169,6 +170,67 @@ const server = http.createServer((req, res) => {
             res.writeHead(200, { "Content-Type": "application/json" });
             res.end(JSON.stringify(submission));
         });
+    } else if (
+        req.method === "PUT" &&
+        parts[1] === "submissions" &&
+        parts[2] !== undefined
+    ) {
+        let body = "";
+
+        req.on("data", (chunk) => {
+            body += chunk;
+        });
+
+        req.on("end", () => {
+
+
+
+            fs.readFile("submissions.json", "utf8", (err, data) => { // Read old submissions
+                if (err) {
+                    sendJSON(res, 500, {
+                        error: "Unable to retrieve submissions"   // If error send JSON error response 
+                    });
+                    return;
+                }
+
+
+                const formData = JSON.parse(body); //Convert formData into JSON
+                const submissions = JSON.parse(data); // Fill submissions with data
+                const index = Number(parts[2]); // Get the requested index number
+                const submission = submissions[index];  // Get the specific indexed data
+
+                if (submission === undefined) {  // Send error if specific submission doesn't exist
+                    sendJSON(res, 404, {
+                        error: "Submission not found"
+                    });
+                    return;
+                }
+
+                submissions[index] = formData;
+
+                const jsonData = JSON.stringify(submissions);
+
+                fs.writeFile("submissions.json", jsonData, (err) => {
+
+                    if (err) {
+                        sendJSON(res, 500, {
+                            error: "Unable to write file"
+                        });
+                        return;
+                    }
+
+                    sendJSON(res, 200, {
+                        message: "Submission updated successfully",
+                        submission: formData
+                    });
+
+                });
+
+            });
+
+        });
+
+
     } else if (
         req.method === "DELETE" &&
         parts[1] === "submissions" &&
