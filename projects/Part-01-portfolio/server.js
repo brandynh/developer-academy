@@ -232,6 +232,95 @@ const server = http.createServer((req, res) => {
 
 
     } else if (
+        req.method === "PATCH" &&
+        parts[1] === "submissions" &&
+        parts[2] !== undefined
+    ) {
+
+        let body = "";
+
+        req.on("data", (chunk) => {
+            body += chunk;
+        });
+
+        req.on("end", () => {
+
+            const updates = JSON.parse(body);
+
+            if (Object.keys(updates).length === 0) {
+
+                sendJSON(res, 400, {
+                    error: "No fields provided to update"
+                });
+                return;
+            }
+
+            if ("name" in updates && !updates.name) {
+                sendJSON(res, 400, {
+                    error: "Name cannot be empty"
+                });
+                return;
+            }
+
+            if ("email" in updates && !updates.email.includes("@")) {
+                sendJSON(res, 400, {
+                    error: "Invalid email"
+                });
+                return;
+            }
+
+            if ("message" in updates && !updates.message) {
+                sendJSON(res, 400, {
+                    error: "Message cannot be empty"
+                });
+                return;
+            }
+
+            fs.readFile("submissions.json", "utf8", (err, data) => {
+                if (err) {
+                    sendJSON(res, 500, {
+                        error: "Unable to retrieve submission"
+                    });
+                    return;
+                }
+
+                const submissions = JSON.parse(data);
+                const index = Number(parts[2]);
+                const submission = submissions[index];
+
+                if (submission === undefined) {
+                    sendJSON(res, 404, {
+                        error: "Submission not found"
+                    });
+                    return;
+                }
+                Object.assign(submission, updates);
+
+
+
+
+                const jsonData = JSON.stringify(submissions);
+
+                fs.writeFile("submissions.json", jsonData, (err) => {
+                    if (err) {
+                        sendJSON(res, 500, {
+                            error: "Unable to write file"
+                        });
+                        return;
+                    }
+
+                    sendJSON(res, 200, {
+                        message: "Submission updated successfully",
+                        submission: submission
+                    });
+
+                });
+            })
+
+        });
+
+
+    } else if (
         req.method === "DELETE" &&
         parts[1] === "submissions" &&
         parts[2] !== undefined
