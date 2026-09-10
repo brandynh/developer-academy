@@ -1,6 +1,8 @@
 const http = require("http");
 const fs = require("fs");
 const { error } = require("console");
+const logger = require("./logger");
+const loadSubmissions = require("./submissions");
 
 function sendJSON(res, statusCode, data) {
 
@@ -11,12 +13,6 @@ function sendJSON(res, statusCode, data) {
 
 };
 
-function logger(req, res, next) {
-
-    console.log("Method:", req.method, "Endpoint:", req.url);
-    next();
-
-}
 
 const server = http.createServer((req, res) => {
 
@@ -137,21 +133,20 @@ const server = http.createServer((req, res) => {
 
 
             });
-        } else if (req.url === "/submissions" && req.method === "GET") {
+        } else if (req.method === "GET" && parts[1] === "submissions") {
 
-            fs.readFile("submissions.json", (err, data) => {
+            loadSubmissions((err, submissions) => {
                 if (err) {
-                    res.writeHead(400, { "Content-Type": "text/plain" });
-                    res.end("Unable to retrieve data.");
+                    sendJSON(res, 500, {
+
+                        error: "Unable to retrieve submissions"
+
+                    });
+                    console.log("Error:", err);
                     return;
                 }
-
-                const submissions = JSON.parse(data);
-                res.writeHead(200, { "Content-Type": "application/json" });
-                res.end(JSON.stringify(submissions));
+                sendJSON(res, 200, submissions);
             });
-
-
 
         } else if (req.method === "GET" &&
             parts[1] === "submissions" &&
@@ -176,8 +171,7 @@ const server = http.createServer((req, res) => {
                     });
                     return;
                 }
-                res.writeHead(200, { "Content-Type": "application/json" });
-                res.end(JSON.stringify(submission));
+                sendJSON(res, 200, submissions);
             });
         } else if (
             req.method === "PUT" &&
