@@ -2,7 +2,8 @@ const http = require("http");
 const fs = require("fs");
 const { error } = require("console");
 const logger = require("./logger");
-const loadSubmissions = require("./submissions");
+const { loadSubmissions, saveSubmissions, addSubmission } = require("./submissions");
+
 
 function sendJSON(res, statusCode, data) {
 
@@ -99,38 +100,20 @@ const server = http.createServer((req, res) => {
 
                 console.log(formData);
 
-                fs.readFile("submissions.json", "utf8", (err, data) => {
+
+                addSubmission(formData, (err) => {
                     if (err) {
-                        console.error(err);
+                        sendJSON(res, 500, {
+                            error: "Unable to save submission"
+                        });
                         return;
                     }
 
-                    const submissions = JSON.parse(data);
-                    submissions.push(formData);
-                    const jsonData = JSON.stringify(submissions);
-
-
-                    fs.writeFile("submissions.json", jsonData, (err) => {
-
-                        if (err) {
-                            console.error(err);
-                            return;
-                        }
-
-                        console.log("Submission Saved!");
-
-                        const response = {
-                            message: "Submission created successfully!",
-                            submission: formData
-                        };
-
-                        sendJSON(res, 201, response);
+                    sendJSON(res, 201, {
+                        message: "Submission saved successfully"
                     });
 
-
                 });
-
-
 
             });
         } else if (req.method === "GET" && parts[1] === "submissions") {

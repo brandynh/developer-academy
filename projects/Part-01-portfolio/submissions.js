@@ -14,12 +14,35 @@ function loadSubmissions(callback) {
     });
 }
 
-// loadSubmissions((err, submissions) => {
-//     if (err) {
-//         console.log("Error:", err);
-//         return;
-//     }
-//     console.log(submissions);
-// });
+function saveSubmissions(submissions, callback) {
 
-module.exports = loadSubmissions;
+    const jsonData = JSON.stringify(submissions);
+
+    fs.writeFile("submissions.json", jsonData, (err) => {
+
+        if (err) {
+            callback(err);
+            return;
+        } else {
+            callback(null);
+        }
+
+    });
+
+}
+
+function addSubmission(newSubmission, callback) {
+    loadSubmissions((err, submissions) => {
+
+        if (err) {
+            callback(err);
+            return;
+        }
+        submissions.push(newSubmission);
+
+        saveSubmissions(submissions, callback);
+    });
+
+}
+
+module.exports = { loadSubmissions, saveSubmissions, addSubmission };
