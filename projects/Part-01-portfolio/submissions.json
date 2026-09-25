@@ -1,1 +1,51 @@
-[{"name":"Brandyn","email":"brandyn@example.com","subject":"Day 14 Updated","message":"PATCH is working!"},{"name":"Claudia","email":"ClaudiaIsCute@cutie.net","subject":"Silly","message":"2nd PATCH test with two attributes updating!"},{"name":"B Silly","email":"b.silly@sillness.net","subject":"Hello","message":"Banananananana"},{"name":"B Silly","email":"b.silly@sillness.net","subject":"Hello","message":"This is a test post with updated error handling"},{"name":"Bryan","email":"bryan@cooldude.com","subject":"Test","message":"This is a test submission"},{"name":"Percy","email":"percy@kittycat.com","subject":"Wow","message":"Meow meow"}]
+[
+  {
+    "name": "Brandyn",
+    "email": "brandyn@example.com",
+    "subject": "Day 14 Updated",
+    "message": "PATCH is working!",
+    "id": 1
+  },
+  {
+    "name": "Claudia",
+    "email": "ClaudiaIsCute@cutie.net",
+    "subject": "Silly",
+    "message": "2nd PATCH test with two attributes updating!",
+    "id": 2
+  },
+  {
+    "name": "B Silly",
+    "email": "b.silly@sillness.net",
+    "subject": "Hello",
+    "message": "Banananananana",
+    "id": 3
+  },
+  {
+    "name": "B Silly",
+    "email": "b.silly@sillness.net",
+    "subject": "Hello",
+    "message": "This is a test post with updated error handling",
+    "id": 4
+  },
+  {
+    "name": "Bryan",
+    "email": "bryan@cooldude.com",
+    "subject": "Test",
+    "message": "This is a test submission",
+    "id": 5
+  },
+  {
+    "name": "Percy",
+    "email": "percy@kittycat.com",
+    "subject": "Wow",
+    "message": "Meow meow",
+    "id": 6
+  },
+  {
+    "name": "Brandoli",
+    "email": "brando@lee.com",
+    "subject": "Yet another Test",
+    "message": "Don't get testy! ",
+    "id": 7
+  }
+]

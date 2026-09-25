@@ -2,7 +2,7 @@ const http = require("http");
 const fs = require("fs");
 const { error } = require("console");
 const logger = require("./logger");
-const { loadSubmissions, saveSubmissions, addSubmission } = require("./submissions");
+const { loadSubmissions, saveSubmissions, addSubmission, findSubmissionById } = require("./submissions");
 
 
 function sendJSON(res, statusCode, data) {
@@ -116,6 +116,33 @@ const server = http.createServer((req, res) => {
                 });
 
             });
+        } else if (req.method === "GET" &&
+            parts[1] === "submissions" &&
+            parts[2] !== undefined
+        ) {
+
+            const id = Number(parts[2]);
+
+            findSubmissionById(id, (err, submission) => {
+
+                if (err) {
+                    sendJSON(res, 500, {
+                        error: "Unable to retrieve submission"
+                    });
+                    return;
+                }
+
+                if (!submission) {
+                    sendJSON(res, 404, {
+                        error: "Submission not found"
+                    });
+                    return;
+                }
+
+                sendJSON(res, 200, submission);
+
+            });
+
         } else if (req.method === "GET" && parts[1] === "submissions") {
 
             loadSubmissions((err, submissions) => {
@@ -131,31 +158,6 @@ const server = http.createServer((req, res) => {
                 sendJSON(res, 200, submissions);
             });
 
-        } else if (req.method === "GET" &&
-            parts[1] === "submissions" &&
-            parts[2] !== undefined
-        ) {
-
-            fs.readFile("submissions.json", "utf8", (err, data) => {
-
-                if (err) {
-                    console.error(err);
-                    return;
-                }
-                const submissions = JSON.parse(data);
-
-                const index = Number(parts[2]);
-                const submission = submissions[index];
-
-                if (submission === undefined) {
-
-                    sendJSON(res, 404, {
-                        error: "Resource not found"
-                    });
-                    return;
-                }
-                sendJSON(res, 200, submissions);
-            });
         } else if (
             req.method === "PUT" &&
             parts[1] === "submissions" &&
